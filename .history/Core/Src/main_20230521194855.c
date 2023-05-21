@@ -112,7 +112,7 @@ int main(void)
     /* USER CODE BEGIN WHILE */
     while (1)     //无限循环，除非遇到中断
     {
-        /*中断程序控制LED8亮灭(i_flash在stm32f4xx_it中赋值)*/
+        /*控制LED8亮灭(i_flash在stm32f4xx_it中赋值)*/
         while (i_flash > 0)
         {
             HAL_GPIO_WritePin(GPIOF, GPIO_PIN_7, GPIO_PIN_SET);    //pf7写为高电平
@@ -122,22 +122,14 @@ int main(void)
             i_flash--;
         }
 
-        /*按键控制LED5亮灭*/
-        if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == GPIO_PIN_RESET)
-        {
-            printf("key2 pressed!\tLED5 light!\n");
-            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_4, GPIO_PIN_SET);     /* key2按下时，led5亮 */
-
-        }
-
         if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) == GPIO_PIN_RESET)   /* sw1 */  //如果pc0为低电平，写pf0为低电平
         {
-            printf("LED1 dark\n");
+            printf("LED1 dark");
             HAL_GPIO_WritePin(GPIOF, GPIO_PIN_0, GPIO_PIN_RESET);
         }
         else
         {
-            printf("LED1 light\n");
+            printf("LED1 light");
             HAL_GPIO_WritePin(GPIOF, GPIO_PIN_0, GPIO_PIN_SET);    //如果pc0为高电平，写pf0为高电平
         }
         if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == GPIO_PIN_SET)  /* sw2 */   //若pc1为高电平
@@ -288,7 +280,7 @@ static void MX_GPIO_Init(void)
     __HAL_RCC_GPIOC_CLK_ENABLE();
 
     /*Configure GPIO pins : PF0 PF1 */
-    GPIO_Initure.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_4 | GPIO_PIN_7;  /* led1/2/5/8*/
+    GPIO_Initure.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_7;  /* led1/2/7*/
     GPIO_Initure.Mode = GPIO_MODE_OUTPUT_PP; //Push Pull推挽输出模式
     GPIO_Initure.Pull = GPIO_NOPULL;
     GPIO_Initure.Speed = GPIO_SPEED_FREQ_LOW;
@@ -307,8 +299,8 @@ static void MX_GPIO_Init(void)
     GPIO_Initure.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOC, &GPIO_Initure);
 
-    /*Configure GPIO pin : PC13*/
-    GPIO_Initure.Pin = GPIO_PIN_13;   /* key2_L  按下按键，key2_L变为低电平，其他时候均为高电平*/
+    /*Configure GPIO pin : PC11*/
+    GPIO_Initure.Pin = GPIO_PIN_11;   /* key2_n */
     GPIO_Initure. Pull = GPIO_NOPULL;
     GPIO_Initure.Mode = GPIO_MODE_INPUT;    /*按键作为输入，亮灯*/
     HAL_GPIO_Init(GPIOC, &GPIO_Initure);

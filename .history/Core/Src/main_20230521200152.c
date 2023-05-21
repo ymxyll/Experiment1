@@ -125,7 +125,7 @@ int main(void)
         /*按键控制LED5亮灭*/
         if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == GPIO_PIN_RESET)
         {
-            printf("key2 pressed!\tLED5 light!\n");
+            printf("key2 pressed!\n");
             HAL_GPIO_WritePin(GPIOF, GPIO_PIN_4, GPIO_PIN_SET);     /* key2按下时，led5亮 */
 
         }
