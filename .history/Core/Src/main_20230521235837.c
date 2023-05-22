@@ -45,8 +45,6 @@ TIM_HandleTypeDef htim6;
 
 /* USER CODE BEGIN PV */
 int i_flash;
-
-int key1_down;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -124,35 +122,12 @@ int main(void)
             i_flash--;
         }
 
-        while (key1_down > 0)
-        {
-          printf("LED5 light!");
-          HAL_GPIO_WritePin(GPIOF, GPIO_PIN_4, GPIO_PIN_SET);
-          HAL_Delay(100);
-          HAL_GPIO_WritePin(GPIOF, GPIO_PIN_4, GPIO_PIN_RESET);
-          printf("LED6 light!");
-          HAL_GPIO_WritePin(GPIOF, GPIO_PIN_5, GPIO_PIN_SET);
-          HAL_Delay(100);
-          HAL_GPIO_WritePin(GPIOF, GPIO_PIN_5, GPIO_PIN_RESET);
-          printf("LED7 light!");
-          HAL_GPIO_WritePin(GPIOF, GPIO_PIN_6, GPIO_PIN_SET);
-          HAL_Delay(100);
-          HAL_GPIO_WritePin(GPIOF, GPIO_PIN_6, GPIO_PIN_RESET);
-          HAL_Delay(100);
-          key1_down--;
-        }
-
         /*按键控制LED5亮灭*/
-        if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_3) == GPIO_PIN_RESET)
+        if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == GPIO_PIN_RESET)
         {
-            printf("sw4 down!\tLED4 light!\n");
-            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_3, GPIO_PIN_SET);     /* 若pc3是低电平，写pf4为高电平 */
+            printf("key2 pressed!\tLED5 light!\n");
+            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_4, GPIO_PIN_SET);     /* key2按下时，led5亮 */
 
-        }
-        else
-        {
-            printf("sw4 up!\tLED3 dark!\n");
-            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_3, GPIO_PIN_RESET);
         }
 
         if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) == GPIO_PIN_RESET)   /* sw1 */  //如果pc0为低电平，写pf0为低电平
@@ -313,36 +288,29 @@ static void MX_GPIO_Init(void)
     __HAL_RCC_GPIOC_CLK_ENABLE();
 
     /*Configure GPIO pins : PF0 PF1 */
-    GPIO_Initure.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6| GPIO_PIN_7;  /* led1/2/5/8*/
+    GPIO_Initure.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_4 | GPIO_PIN_7;  /* led1/2/5/8*/
     GPIO_Initure.Mode = GPIO_MODE_OUTPUT_PP; //Push Pull推挽输出模式
     GPIO_Initure.Pull = GPIO_NOPULL;
     GPIO_Initure.Speed = GPIO_SPEED_FREQ_LOW;
     HAL_GPIO_Init(GPIOF, &GPIO_Initure);
     HAL_GPIO_WritePin(GPIOF, GPIO_PIN_7, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(GPIOF, GPIO_PIN_6, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(GPIOF, GPIO_PIN_5, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(GPIOF, GPIO_PIN_4, GPIO_PIN_RESET);
 
     /*Configure GPIO pins : PC0 PC1 */
-    GPIO_Initure.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_3;  /* sw1 & 2 & 4*/
+    GPIO_Initure.Pin = GPIO_PIN_0 | GPIO_PIN_1;  /* sw1 & 2*/
     GPIO_Initure.Mode = GPIO_MODE_INPUT;
     GPIO_Initure.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOC, &GPIO_Initure);
-
-    /*Configure GPIO pin : PC11*/
-    GPIO_Initure.Pin = GPIO_PIN_11;   /* key2_n */
-    GPIO_Initure.Mode = GPIO_MODE_IT_RISING;    /*按键上升沿触发中断*/    
-    GPIO_Initure. Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(GPIOC, &GPIO_Initure);
-
-    //中断优先级
-    HAL_NVIC_SetPriority(EXTI9_5_IRQn, 4, 0);
-    HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
     /*Configure GPIO pin : PC8 */
     GPIO_Initure.Pin = GPIO_PIN_8;   /* key1_n */
     GPIO_Initure.Mode = GPIO_MODE_IT_RISING;    //按键上升沿触发中断
     GPIO_Initure.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOC, &GPIO_Initure);
+
+    /*Configure GPIO pin : PC13*/
+    GPIO_Initure.Pin = GPIO_PIN_13;   /* key2_L  按下按键，key2_L变为低电平，其他时候均为高电平*/
+    GPIO_Initure. Pull = GPIO_NOPULL;
+    GPIO_Initure.Mode = GPIO_MODE_INPUT;    /*按键作为输入，亮灯*/
     HAL_GPIO_Init(GPIOC, &GPIO_Initure);
 
     //中断优先级

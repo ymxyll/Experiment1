@@ -60,6 +60,7 @@ extern UART_HandleTypeDef huart1;
 extern TIM_HandleTypeDef htim6;
 /* USER CODE BEGIN EV */
 extern int i_flash;
+extern int key1_down;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -266,8 +267,8 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 */
     switch(GPIO_Pin)
     {
-        case GPIO_PIN_8:
-          printf("KEY1 PRESSAED! %ld\n", HAL_GetTick());
+        case GPIO_PIN_11:
+          printf("KEY2 PRESSAED! %ld\n", HAL_GetTick());
           i_flash = 5;
 /*          for (i = 0; i < 5; i++)
           {
@@ -276,7 +277,12 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
               HAL_GPIO_WritePin(GPIOF, GPIO_PIN_7, GPIO_PIN_RESET);
               HAL_Delay(100);
           }
- */         break;
+ */     
+          break;
+        case GPIO_PIN_8:
+          printf("KEY1 PRESSAED! %ld\n", HAL_GetTick());
+          key1_down = 5;
+          break;
     }
 }
 
