@@ -142,7 +142,7 @@ int main(void)
             HAL_GPIO_WritePin(GPIOF, GPIO_PIN_3, GPIO_PIN_RESET);       
         }
 
-        if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_3) == GPIO_PIN_RESET)
+        if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_2) == GPIO_PIN_RESET)
         {
             HAL_GPIO_WritePin(GPIOF, GPIO_PIN_5, GPIO_PIN_RESET);
             HAL_GPIO_WritePin(GPIOF, GPIO_PIN_6, GPIO_PIN_RESET);
@@ -310,7 +310,7 @@ static void MX_GPIO_Init(void)
     HAL_GPIO_WritePin(GPIOF, GPIO_PIN_7, GPIO_PIN_RESET);
 
     /*Configure GPIO pins : PC0 PC1 */
-    GPIO_Initure.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3; /* sw1 & 2 & 3*/
+    GPIO_Initure.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2; /* sw1 & 2 & 3*/
     GPIO_Initure.Mode = GPIO_MODE_INPUT;
     GPIO_Initure.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOC, &GPIO_Initure);

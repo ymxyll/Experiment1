@@ -319,7 +319,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       HAL_GPIO_WritePin(GPIOF, GPIO_PIN_5, GPIO_PIN_RESET);
       HAL_GPIO_WritePin(GPIOF, GPIO_PIN_4, GPIO_PIN_SET);
       HAL_Delay(100);
-      HAL_GPIO_WritePin(GPIOF, GPIO_PIN_4, GPIO_PIN_RESET);
     }
     break;
   }

@@ -1,22 +1,22 @@
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
- * @file           : main.c
- * @brief          : Main program body
- ******************************************************************************
- * @attention
- *
- * Copyright (c) 2023 STMicroelectronics.
- * All rights reserved.
- *
- * This software is licensed under terms that can be found in the LICENSE file
- * in the root directory of this software component.
- * If no LICENSE file comes with this software, it is provided AS-IS.
- *
- ******************************************************************************
- */
-/* USER CODE END Header */
-/* Includes ------------------------------------------------------------------*/
+  ******************************************************************************
+  * @file           : main.c
+  * @brief          : Main program body
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2023 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
+  /* USER CODE END Header */
+  /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stdio.h"
 
@@ -44,7 +44,9 @@ UART_HandleTypeDef huart1;
 TIM_HandleTypeDef htim6;
 
 /* USER CODE BEGIN PV */
-int i_flash;
+int i_flash = 0;
+
+int key1_down = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -60,18 +62,17 @@ static void MX_TIM6_Init(void);
 /* USER CODE BEGIN 0 */
 /*to redirect printf to uart with semihosting.*/
 
-int _write(int fd, char *ptr, int len)
-{
-    HAL_UART_Transmit(&huart1, (uint8_t *)ptr, len, HAL_MAX_DELAY);
+int _write(int fd, char* ptr, int len) {
+    HAL_UART_Transmit(&huart1, (uint8_t*)ptr, len, HAL_MAX_DELAY);
     return len;
 }
 
 /* USER CODE END 0 */
 
 /**
- * @brief  The application entry point.
- * @retval int
- */
+  * @brief  The application entry point.
+  * @retval int
+  */
 int main(void)
 {
     /* USER CODE BEGIN 1 */
@@ -99,8 +100,8 @@ int main(void)
     MX_GPIO_Init();
     MX_USART1_UART_Init();
     MX_TIM6_Init();
-/* USER CODE BEGIN 2 */
-#if START_TIM6
+    /* USER CODE BEGIN 2 */
+# if START_TIM6
     if (HAL_TIM_Base_Start_IT(&htim6) != HAL_OK)
     {
         Error_Handler();
@@ -111,60 +112,93 @@ int main(void)
 
     /* Infinite loop */
     /* USER CODE BEGIN WHILE */
-    while (1)
+    while (1)     //无限循环，除非遇到中断
     {
-        if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) == GPIO_PIN_RESET) /* sw1 */
-            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_0, GPIO_PIN_RESET);
-        else
-            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_0, GPIO_PIN_SET);
-
-        if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == GPIO_PIN_RESET)
-            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_4, GPIO_PIN_RESET);
-        else
-            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_4, GPIO_PIN_SET);
-        
-        if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_2) == GPIO_PIN_RESET)
+        /*中断程序控制LED8亮灭(i_flash在stm32f4xx_it中赋值)*/
+        while (i_flash > 0)
         {
-            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_1, GPIO_PIN_RESET);
-            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_2, GPIO_PIN_RESET);
+            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_7, GPIO_PIN_SET);    //pf7写为高电平
+            HAL_Delay(100);
+            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_7, GPIO_PIN_RESET);  //pf7写为低电平
+            HAL_Delay(100);
+            i_flash--;
+        }
+
+        // if (i_flash > 0)
+        // {
+        //     HAL_GPIO_WritePin(GPIOF, GPIO_PIN_7, GPIO_PIN_SET);    //pf7写为高电平
+        //     HAL_Delay(100);
+        //     HAL_GPIO_WritePin(GPIOF, GPIO_PIN_7, GPIO_PIN_RESET);  //pf7写为低电平
+        //     HAL_Delay(100);
+        //     i_flash = 0;
+        // }
+
+        while (key1_down > 0)
+        {
+          printf("LED5 light!");
+          HAL_GPIO_WritePin(GPIOF, GPIO_PIN_4, GPIO_PIN_SET);
+          HAL_Delay(100);
+          HAL_GPIO_WritePin(GPIOF, GPIO_PIN_4, GPIO_PIN_RESET);
+          printf("LED6 light!");
+          HAL_GPIO_WritePin(GPIOF, GPIO_PIN_5, GPIO_PIN_SET);
+          HAL_Delay(100);
+          HAL_GPIO_WritePin(GPIOF, GPIO_PIN_5, GPIO_PIN_RESET);
+          printf("LED7 light!");
+          HAL_GPIO_WritePin(GPIOF, GPIO_PIN_6, GPIO_PIN_SET);
+          HAL_Delay(100);
+          HAL_GPIO_WritePin(GPIOF, GPIO_PIN_6, GPIO_PIN_RESET);
+          HAL_Delay(100);
+          key1_down--;
+        }
+
+        if (key1_down > 0)
+        {
+          printf("LED5 light!");
+          HAL_GPIO_WritePin(GPIOF, GPIO_PIN_4, GPIO_PIN_SET);
+          HAL_Delay(100);
+          HAL_GPIO_WritePin(GPIOF, GPIO_PIN_4, GPIO_PIN_RESET);
+          printf("LED6 light!");
+          HAL_GPIO_WritePin(GPIOF, GPIO_PIN_5, GPIO_PIN_SET);
+          HAL_Delay(100);
+          HAL_GPIO_WritePin(GPIOF, GPIO_PIN_5, GPIO_PIN_RESET);
+          printf("LED7 light!");
+          HAL_GPIO_WritePin(GPIOF, GPIO_PIN_6, GPIO_PIN_SET);
+          HAL_Delay(100);
+          HAL_GPIO_WritePin(GPIOF, GPIO_PIN_6, GPIO_PIN_RESET);
+          HAL_Delay(100);
+          key1_down = 0;
+        }
+
+        /*按键控制LED5亮灭*/
+        if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_3) == GPIO_PIN_RESET)
+        {
+            printf("sw4 down!\tLED4 light!\n");
+            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_3, GPIO_PIN_SET);     /* 若pc3是低电平，写pf4为高电平 */
+
+        }
+        else
+        {
+            printf("sw4 up!\tLED3 dark!\n");
             HAL_GPIO_WritePin(GPIOF, GPIO_PIN_3, GPIO_PIN_RESET);
         }
-        else
-        {
-            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_1, GPIO_PIN_SET);
-            HAL_Delay(100);
-            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_1, GPIO_PIN_RESET);
-            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_2, GPIO_PIN_SET);
-            HAL_Delay(100);
-            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_2, GPIO_PIN_RESET);
-            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_3, GPIO_PIN_SET);  
-            HAL_Delay(100);
-            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_3, GPIO_PIN_RESET);       
-        }
 
-        if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_3) == GPIO_PIN_RESET)
+        if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) == GPIO_PIN_RESET)   /* sw1 */  //如果pc0为低电平，写pf0为低电平
         {
-            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_5, GPIO_PIN_RESET);
-            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_6, GPIO_PIN_RESET);
-            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_7, GPIO_PIN_RESET);   
+            printf("LED1 dark\n");
+            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_0, GPIO_PIN_RESET);
         }
         else
         {
-            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_5, GPIO_PIN_SET);
-            HAL_Delay(100);
-            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_5, GPIO_PIN_RESET);
-            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_6, GPIO_PIN_SET);
-            HAL_Delay(100);
-            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_6, GPIO_PIN_RESET);
-            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_7, GPIO_PIN_SET);  
-            HAL_Delay(100);
-            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_7, GPIO_PIN_RESET);
+            printf("LED1 light\n");
+            HAL_GPIO_WritePin(GPIOF, GPIO_PIN_0, GPIO_PIN_SET);    //如果pc0为高电平，写pf0为高电平
         }
+        if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == GPIO_PIN_SET)  /* sw2 */   //若pc1为高电平
+            HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_1);    //改变引脚输出状态，pf1高变低，低变高
 
-        HAL_Delay(500);
+        HAL_Delay(500); //延时500ms
 
-        if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) == GPIO_PIN_SET)
-            printf("Working:%d: %ld\n", i++, HAL_GetTick());
+        if (HAL_GPIO_ReadPin(GPIOF, GPIO_PIN_1) == GPIO_PIN_SET)    //如果pf1为高电平
+            printf("Working:%d: %ld\n", i++, HAL_GetTick());  //输出输出次数以及当前时间
 
         /* USER CODE END WHILE */
 
@@ -174,22 +208,23 @@ int main(void)
 }
 
 /**
- * @brief System Clock Configuration
- * @retval None
- */
+  * @brief System Clock Configuration
+  * @retval None
+  */
 void SystemClock_Config(void)
 {
-    RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-    RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+    RCC_OscInitTypeDef RCC_OscInitStruct = { 0 };
+    RCC_ClkInitTypeDef RCC_ClkInitStruct = { 0 };
+    //分别配置时钟源和各总线的分频系数
 
     /** Configure the main internal regulator output voltage
-     */
+    */
     __HAL_RCC_PWR_CLK_ENABLE();
     __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
     /** Initializes the RCC Oscillators according to the specified parameters
-     * in the RCC_OscInitTypeDef structure.
-     */
+    * in the RCC_OscInitTypeDef structure.
+    */
     RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
     RCC_OscInitStruct.HSEState = RCC_HSE_ON;
     RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
@@ -204,8 +239,9 @@ void SystemClock_Config(void)
     }
 
     /** Initializes the CPU, AHB and APB buses clocks
-     */
-    RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+    */
+    RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
+        | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
     RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
     RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
     RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
@@ -218,10 +254,10 @@ void SystemClock_Config(void)
 }
 
 /**
- * @brief TIM6 Initialization Function
- * @param None
- * @retval None
- */
+  * @brief TIM6 Initialization Function
+  * @param None
+  * @retval None
+  */
 static void MX_TIM6_Init(void)
 {
 
@@ -229,7 +265,7 @@ static void MX_TIM6_Init(void)
 
     /* USER CODE END TIM6_Init 0 */
 
-    TIM_MasterConfigTypeDef sMasterConfig = {0};
+    TIM_MasterConfigTypeDef sMasterConfig = { 0 };
 
     /* USER CODE BEGIN TIM6_Init 1 */
 
@@ -252,13 +288,14 @@ static void MX_TIM6_Init(void)
     /* USER CODE BEGIN TIM6_Init 2 */
 
     /* USER CODE END TIM6_Init 2 */
+
 }
 
 /**
- * @brief USART1 Initialization Function
- * @param None
- * @retval None
- */
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
 static void MX_USART1_UART_Init(void)
 {
 
@@ -284,13 +321,14 @@ static void MX_USART1_UART_Init(void)
     /* USER CODE BEGIN USART1_Init 2 */
 
     /* USER CODE END USART1_Init 2 */
+
 }
 
 /**
- * @brief GPIO Initialization Function
- * @param None
- * @retval None
- */
+  * @brief GPIO Initialization Function
+  * @param None
+  * @retval None
+  */
 static void MX_GPIO_Init(void)
 {
     GPIO_InitTypeDef GPIO_Initure;
@@ -302,35 +340,42 @@ static void MX_GPIO_Init(void)
     __HAL_RCC_GPIOC_CLK_ENABLE();
 
     /*Configure GPIO pins : PF0 PF1 */
-    GPIO_Initure.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7; /* led1/2/3/4/5/6/7/8*/
-    GPIO_Initure.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_Initure.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6| GPIO_PIN_7;  /* led1/2/5/8*/
+    GPIO_Initure.Mode = GPIO_MODE_OUTPUT_PP; //Push Pull推挽输出模式
     GPIO_Initure.Pull = GPIO_NOPULL;
     GPIO_Initure.Speed = GPIO_SPEED_FREQ_LOW;
     HAL_GPIO_Init(GPIOF, &GPIO_Initure);
     HAL_GPIO_WritePin(GPIOF, GPIO_PIN_7, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOF, GPIO_PIN_6, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOF, GPIO_PIN_5, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOF, GPIO_PIN_4, GPIO_PIN_RESET);
 
     /*Configure GPIO pins : PC0 PC1 */
-    GPIO_Initure.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3; /* sw1 & 2 & 3*/
+    GPIO_Initure.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_3;  /* sw1 & 2 & 4*/
     GPIO_Initure.Mode = GPIO_MODE_INPUT;
     GPIO_Initure.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOC, &GPIO_Initure);
 
+    /*Configure GPIO pin : PC11*/
+    GPIO_Initure.Pin = GPIO_PIN_11;   /* key2_n */
+    GPIO_Initure.Mode = GPIO_MODE_IT_RISING;    /*按键上升沿触发中断*/    
+    GPIO_Initure. Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOC, &GPIO_Initure);
+
+    // 中断优先级
+    HAL_NVIC_SetPriority(EXTI9_5_IRQn, 3, 0);   // 设置 PC11 对应的外部中断线
+    HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);            // 使能中断
+
     /*Configure GPIO pin : PC8 */
-    GPIO_Initure.Pin = GPIO_PIN_8; /* key1_n */
-    GPIO_Initure.Mode = GPIO_MODE_IT_RISING;
+    GPIO_Initure.Pin = GPIO_PIN_8;   /* key1_n */
+    GPIO_Initure.Mode = GPIO_MODE_IT_RISING;    //按键上升沿触发中断
     GPIO_Initure.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOC, &GPIO_Initure);
 
-    HAL_NVIC_SetPriority(EXTI9_5_IRQn, 5, 0);
-    HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
-
-    GPIO_Initure.Pin = GPIO_PIN_11; /* key2_n */
-    GPIO_Initure.Mode = GPIO_MODE_IT_RISING;
-    GPIO_Initure.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(GPIOC, &GPIO_Initure);
-
+    //中断优先级
     HAL_NVIC_SetPriority(EXTI15_10_IRQn, 4, 0);
     HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+
 }
 
 /* USER CODE BEGIN 4 */
@@ -338,9 +383,9 @@ static void MX_GPIO_Init(void)
 /* USER CODE END 4 */
 
 /**
- * @brief  This function is executed in case of error occurrence.
- * @retval None
- */
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
 void Error_Handler(void)
 {
     /* USER CODE BEGIN Error_Handler_Debug */
@@ -352,19 +397,19 @@ void Error_Handler(void)
     /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef USE_FULL_ASSERT
+#ifdef  USE_FULL_ASSERT
 /**
- * @brief  Reports the name of the source file and the source line number
- *         where the assert_param error has occurred.
- * @param  file: pointer to the source file name
- * @param  line: assert_param error line source number
- * @retval None
- */
-void assert_failed(uint8_t *file, uint32_t line)
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
+void assert_failed(uint8_t* file, uint32_t line)
 {
     /* USER CODE BEGIN 6 */
     /* User can add his own implementation to report the file name and line number,
        ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-    /* USER CODE END 6 */
+       /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
